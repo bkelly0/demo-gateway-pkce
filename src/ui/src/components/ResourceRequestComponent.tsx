@@ -3,10 +3,10 @@ import { Spinner } from './Spinner';
 
 
 export default function ResourceRequestComponent({
-    url, expectedSuccess, resultMessage
+    url, expectedStatus, resultMessage
 }: {
     url: string;
-    expectedSuccess: boolean;
+    expectedStatus: number;
     resultMessage: string;
 }) {
   const [retryTrigger, setRetryTrigger] = useState(false);
@@ -14,6 +14,7 @@ export default function ResourceRequestComponent({
     'idle' | 'loading' | 'success' | 'error'
   >('idle');
   const [resourceResponse, setResourceResponse] = useState('');
+  const [statusCodeState, setStatusCodeState] = useState<number>(0);
 
   useEffect(() => {
 
@@ -29,6 +30,7 @@ export default function ResourceRequestComponent({
           signal: abortController.signal,
         });
         const responseBody = await response.text();
+        setStatusCodeState(response.status);
 
         if (!response.ok) {
           setResourceRequestState('error');
@@ -79,14 +81,10 @@ export default function ResourceRequestComponent({
           </p>
           <pre className="protected-api-body">{resourceResponse}</pre>
           <div className="protected-api-feedback">
-            {resourceRequestState === 'success' && expectedSuccess
+            {statusCodeState === expectedStatus
                 ? <p><span className="success">Expected Result! </span>{resultMessage}</p>
                 : null}
-            {resourceRequestState === 'error' && !expectedSuccess
-                ? <p><span className="success">Expected Result! </span>{resultMessage}</p>
-                : null}
-            {(resourceRequestState === 'success' && !expectedSuccess)
-                || (resourceRequestState === 'error' && expectedSuccess)
+            {(statusCodeState != expectedStatus)
                 ? <p><span className="failed">This is not the expected result based on the user!</span></p>
                 : null}
           </div>

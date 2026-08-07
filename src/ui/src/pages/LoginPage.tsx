@@ -1,5 +1,13 @@
 import { Link, Navigate } from 'react-router-dom';
 
+/**
+ * This page is not used yet, but will be used to support SSO logins from other providers.
+ * @param param0
+ * @param param0.authChecked
+ * @param param0.isAuthenticated
+ * @constructor
+ */
+
 export default function LoginPage({
   authChecked,
   isAuthenticated,

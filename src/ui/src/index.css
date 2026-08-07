@@ -216,6 +216,11 @@ h1 {
   gap: 1rem;
 }
 
+.protected-card > p,
+.protected-card > ul {
+  width: 100%;
+}
+
 .protected-text {
   margin: 0;
   font-size: clamp(2rem, 5vw, 4rem);
@@ -309,4 +314,14 @@ h1 {
 .success {
   color: #34eb5e;
   font-weight: 600;
+}
+
+.about-github-link {
+  color: #7dd3fc; /* light blue */
+  text-decoration: none;
+}
+
+.about-github-link:hover {
+  color: #bae6fd;
+  text-decoration: underline;
 }

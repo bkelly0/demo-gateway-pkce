@@ -58,26 +58,31 @@ export default function ProtectedPage({
     <main className="main-shell">
       <section className="main-card protected-card">
         <p className="protected-text">Resource Access</p>
-        <p className="protected-welcome">Welcome {username ?? 'User'}</p>
         <p>
-          This page requests protected resources through the API gateway. Request success depends on user authentication, authorization, and the gateway and resource server configurations.        </p>
-        <p>
-          Traffic flows securely from the gateway through a Direct VPC egress to reach the private resource server without exposing tokens.        </p>
-        <p>
-          <ul>
-            <li>
-              The <strong>api/a</strong> request requires the user to have the role <strong>read:a</strong>
-            </li>
-            <li>
-              The <strong>api/b</strong> request requires the user to have the role <strong>read:b</strong>
-            </li>
-            <li>
-              Both requests require the client to have the <strong>resources:read</strong> scope.
-            </li>
-          </ul>
+          This page requests protected resources through the API gateway. Request success depends on user authentication, authorization, and the gateway and resource server configurations.
         </p>
-        <ResourceRequestComponent url={"/api/a/v1"} expectedSuccess={true} resultMessage={getMessageA()} />
-        <ResourceRequestComponent url={"/api/b/v1"} expectedSuccess={false} resultMessage={getMessageB()}/>
+        <p>
+          Traffic flows securely from the gateway through a Direct VPC egress to reach the private resource server without exposing tokens.
+        </p>
+        <ul>
+          <li>
+            The <strong>api/a</strong> request requires the user to have the role <strong>read:a</strong>
+          </li>
+          <li>
+            The <strong>api/b</strong> request requires the user to have the role <strong>read:b</strong>
+          </li>
+          <li>
+            Both requests require the client to have the <strong>resources:read</strong> scope.
+          </li>
+        </ul>
+        <p>
+          Signed in as {username ?? 'User'}
+          <a className="authorize-button" href="/api/logout">
+            Logout to try as another user
+          </a>
+        </p>
+        <ResourceRequestComponent url={"/api/a/v1"} expectedStatus={200} resultMessage={getMessageA()} />
+        <ResourceRequestComponent url={"/api/b/v1"} expectedStatus={403} resultMessage={getMessageB()}/>
       </section>
     </main>
   );

@@ -15,9 +15,9 @@ export default function AppLayout({
           About
         </Link>
         {!isAuthenticated ? (
-          <Link className="top-nav__link" to="/login">
-            Login
-          </Link>
+          <a className="top-nav__link" href="/oauth2/authorization/demo">
+            Sign In As Demo User
+          </a>
         ) : null}
         {isAuthenticated ? (
           <><Link className="top-nav__link" to="/protected">

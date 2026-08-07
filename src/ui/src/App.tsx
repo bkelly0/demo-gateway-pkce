@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
+import {useCallback, useEffect, useState} from 'react';
+import {Navigate, Route, Routes, useLocation, useNavigate} from 'react-router-dom';
 import AppLayout from './components/AppLayout';
 import AboutPage from './pages/AboutPage';
 import LoginPage from './pages/LoginPage';
@@ -14,51 +14,33 @@ export default function App() {
   const [authChecked, setAuthChecked] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const location = useLocation()
 
-  useEffect(() => {
-    let isMounted = true;
+  const updateAuthStatus = useCallback(async () => {
 
-    const checkAuthStatus = async () => {
-      try {
-        const response = await fetch('/api/auth/auth-status', {
-          method: 'GET',
-          credentials: 'include',
+      const response = await fetch('/api/auth/auth-status', {
+            method: 'GET',
+            credentials: 'include',
         });
 
         if (!response.ok) {
-          throw new Error('auth-status request failed');
+            throw new Error('auth-status request failed');
         }
 
         const authStatus: AuthenticationStatusResponse = await response.json();
-        if (!isMounted) {
-          return;
-        }
-
         setIsAuthenticated(authStatus.authenticated);
         setUsername(authStatus.username);
-      } catch {
-        if (isMounted) {
-          setIsAuthenticated(false);
-          setUsername(null);
-        }
-      } finally {
-        if (isMounted) {
-          setAuthChecked(true);
-        }
-      }
-    };
+        setAuthChecked(true);
+    }, []);
 
-    checkAuthStatus();
+  useEffect(() => {
+      void updateAuthStatus();
+  }, [updateAuthStatus, location.pathname]);
 
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const handleLogout = async () => {
-      window.location.href = '/api/logout';
-  };
+  useEffect(() => {
+      const onFocus = () => void updateAuthStatus();
+      window.addEventListener('focus', onFocus);
+  }, [updateAuthStatus]);
 
   return (
     <Routes>

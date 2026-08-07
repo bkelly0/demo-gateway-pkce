@@ -29,9 +29,4 @@ public class SpaForwardController implements ErrorController {
 
     return "forward:/";
   }
-
-  @GetMapping("/protected")
-  public String forwardProtected() {
-    return "forward:/index.html";
-  }
 }

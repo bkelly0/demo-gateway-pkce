@@ -11,12 +11,11 @@ spring:
     import: "optional:configserver:${CONFIG_SERVER:http://localhost:8888}"
   security:
     oauth2:
-
       client:
         registration:
           demo:
             client-id: gateway-client
-            client-secret: your-client-secret
+            client-secret: client-secret
             authorization-grant-type: authorization_code
             redirect-uri: http://localhost:8080/login/oauth2/code/{registrationId}
             scope:
