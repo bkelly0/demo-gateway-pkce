@@ -1,0 +1,11 @@
+build
+.gradle
+**/node_modules
+src/ui/dist
+src/ui/.vite
+.idea
+*.iml
+*.log
+test_output.txt
+valkey_data
+

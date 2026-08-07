@@ -1,0 +1,116 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '4.1.0'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id("com.diffplug.spotless") version "8.9.0"
+}
+
+import org.gradle.internal.os.OperatingSystem
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	set('springCloudVersion', "2025.1.2")
+}
+
+def uiDir = layout.projectDirectory.dir('src/ui')
+def uiDistDir = uiDir.dir('dist')
+def generatedUiResourcesDir = layout.buildDirectory.dir('generated-resources/main/static')
+
+def npmCommand = OperatingSystem.current().isWindows() ? 'npm.cmd' : 'npm'
+
+dependencyManagement {
+	imports {
+		mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.1.0'
+	}
+}
+
+dependencies {
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+	implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-client'
+	implementation 'org.springframework.cloud:spring-cloud-starter-gateway-server-webmvc'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.session:spring-session-data-redis'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'com.google.auth:google-auth-library-oauth2-http:1.30.0'
+
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-security-oauth2-client-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-security-oauth2-client-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+tasks.register('npmInstall', Exec) {
+	workingDir = uiDir.asFile
+	commandLine npmCommand, 'ci'
+	inputs.file(uiDir.file('package.json'))
+	inputs.file(uiDir.file('package-lock.json'))
+	outputs.dir(uiDir.dir('node_modules'))
+}
+
+tasks.register('buildFrontend', Exec) {
+	dependsOn tasks.named('npmInstall')
+	workingDir = uiDir.asFile
+	commandLine npmCommand, 'run', 'build'
+	inputs.files(fileTree(uiDir) {
+		include 'src/**'
+		include 'index.html'
+		include 'package.json'
+		include 'package-lock.json'
+		include 'tsconfig*.json'
+		include 'vite.config.ts'
+	})
+	outputs.dir(uiDistDir)
+}
+
+tasks.register('copyFrontendBuild', Copy) {
+	dependsOn tasks.named('buildFrontend')
+	from uiDistDir
+	into generatedUiResourcesDir
+	includeEmptyDirs = false
+}
+
+tasks.named('processResources') {
+	dependsOn tasks.named('copyFrontendBuild')
+	from(generatedUiResourcesDir) {
+		into 'static'
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile) {
+	dependsOn 'spotlessApply'
+}
+
+spotless {
+	java {
+		googleJavaFormat()
+		removeUnusedImports()
+	}
+}

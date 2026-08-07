@@ -1,0 +1,91 @@
+server:
+  servlet:
+    session:
+      cookie:
+        name: GATEWAYSESSION #prevent cookie collision with other apps running on the same domain
+
+spring:
+  application:
+    name: gateway-service-demo
+  config:
+    import: "optional:configserver:${CONFIG_SERVER:http://localhost:8888}"
+  security:
+    oauth2:
+
+      client:
+        registration:
+          demo:
+            client-id: gateway-client
+            client-secret: your-client-secret
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:8080/login/oauth2/code/{registrationId}
+            scope:
+              - openid
+              - profile
+              - read:resource
+        provider:
+          demo:
+            issuer-uri: http://localhost:8081
+            user-name-attribute: sub
+  web:
+    error:
+      whitelabel:
+        enabled: false
+
+app:
+  resource-server-uri: http://localhost:8082
+  user-token-header: X-User-Access-Token
+  post-logout-redirect-uri: http://localhost:8080
+  enable-google-auth: true #can be disabled for use without application default credentials
+  cors:
+    allowed-origins:
+      - "http://localhost:8080"
+    allowed-methods:
+      - "GET"
+      - "POST"
+      - "OPTIONS"
+    allowed-headers:
+      - "*"
+    allow-credentials: true
+    max-age: 3600
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+logging:
+  level:
+    org.springframework.security: TRACE
+
+---
+spring:
+  config:
+    activate:
+      on-profile: database
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: valkey_password
+      connect-timeout: 2000ms
+      timeout: 2000ms
+
+---
+spring:
+  config:
+    activate:
+      on-profile: json-logs
+logging:
+  structured:
+    format:
+      console: logstash
+
+---
+spring:
+  config:
+    activate:
+      on-profile: disable-google-auth
+app:
+  enable-google-auth: false

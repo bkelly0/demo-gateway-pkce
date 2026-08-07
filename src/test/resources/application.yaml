@@ -1,0 +1,37 @@
+spring:
+  config:
+    import: "optional:configserver:${CONFIG_SERVER:http://localhost:8888}"
+  security:
+    oauth2:
+      client:
+        registration:
+          demo:
+            client-id: test-client
+            client-secret: test-secret
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost/login/oauth2/code/demo
+            scope:
+              - openid
+        provider:
+          demo:
+            authorization-uri: http://localhost:8081/oauth2/authorize
+            token-uri: http://localhost:8081/oauth2/token
+            jwk-set-uri: http://localhost:8081/oauth2/jwks
+            user-info-uri: http://localhost:8081/userinfo
+            user-name-attribute: sub
+
+
+app:
+  user-token-header: X-User-Access-Token
+  post-logout-redirect-uri: http://localhost:8080
+  resource-server-uri: http://localhost:8082
+  enable-google-auth: false
+  cors:
+    allowed-origins:
+      - http://localhost:8080
+    allowed-methods:
+      - GET
+    allowed-headers:
+      - "*"
+    allow-credentials: true
+    max-age: 3600

@@ -1,0 +1,70 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    id: Build image
+    args:
+      - build
+      - -f
+      - Dockerfile
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_IMAGE_NAME}:$SHORT_SHA
+      - .
+
+  - name: gcr.io/cloud-builders/docker
+    id: Push image
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_IMAGE_NAME}:$SHORT_SHA
+
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: Deploy to Cloud Run
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_SERVICE_NAME}
+      - --image
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_IMAGE_NAME}:$SHORT_SHA
+      - --region
+      - ${_REGION}
+      - --platform
+      - managed
+      - --allow-unauthenticated
+      - --service-account
+      - ${_SERVICE_ACCOUNT}
+      - --network
+      - ${_VPC_NETWORK}
+      - --subnet
+      - ${_VPC_SUBNET}
+      - --vpc-egress
+      - ${_VPC_EGRESS}
+      - --min-instances=0
+      - --max-instances=1
+      - --port
+      - "8080"
+      - --set-secrets
+      - "AUTH_SERVER_CLIENT_SECRET=oauth-demo-default-client-secret:latest"
+      - --set-env-vars
+      - "^|^SPRING_PROFILES_ACTIVE=${_PROFILES}|SPRING_CLOUD_CONFIG_PROFILE=${_PROFILES}|AUTH_SERVER_CLIENT_ID=${_AUTH_SERVER_CLIENT_ID}|AUTH_SERVER_REDIRECT_URI=${_AUTH_SERVER_REDIRECT_URI}|AUTH_SERVER_ISSUER_URI=${_AUTH_SERVER_ISSUER_URI}|POST_LOGOUT_REDIRECT_URI=${_POST_LOGOUT_REDIRECT_URI}|RESOURCE_SERVER_URI=${_RESOURCE_SERVER_URI}|CONFIG_SERVER=${_CONFIG_SERVER}"
+
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_IMAGE_NAME}:$SHORT_SHA
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _REGION: us-central1
+  _AR_REPO: app-images
+  _IMAGE_NAME: demo-auth-gateway
+  _SERVICE_NAME: demo-auth-gateway
+  _SERVICE_ACCOUNT: demo-gateway-sa@bkelly-portfolio.iam.gserviceaccount.com
+  _VPC_NETWORK: demo-vpc
+  _VPC_SUBNET: cloud-run-egress-subnet
+  _VPC_EGRESS: all-traffic
+  _PROFILES: database,json-logs
+  _AUTH_SERVER_CLIENT_ID: gateway-client
+  _AUTH_SERVER_REDIRECT_URI: https://demo-auth-gateway.bradfordkelly.com/login/oauth2/code/demo
+  _AUTH_SERVER_ISSUER_URI: https://auth.bradfordkelly.com
+  _POST_LOGOUT_REDIRECT_URI: https://demo-auth-gateway.bradfordkelly.com
+  _RESOURCE_SERVER_URI:
+  _CONFIG_SERVER:
