@@ -36,10 +36,10 @@ export default function AboutPage() {
                     <dl>
                         <dt>
                             <h3>1. Backend-for-Frontend (BFF) Gateway</h3>
-                            <p><strong>Tech:</strong> Java, Spring Cloud Gateway, Valkey</p>
+                            <p><strong>Tech:</strong> Java, Spring Cloud Gateway, Valkey, GCP Secret Manager</p>
                         </dt>
                         <dd>
-                            Acts as the secure host for the React/TypeScript SPA and executes the OAuth 2.0 PKCE flow on behalf of the client. By storing session state in Valkey, the gateway maintains stateless, scalable instances on Cloud Run without requiring sticky sessions or exposing tokens to the browser. Uses Direct VPC Egress for internal routing.
+                            Acts as the secure host for the React/TypeScript SPA and executes the OAuth 2.0 PKCE flow on behalf of the client. By storing session state in Valkey, the gateway maintains stateless, scalable instances on Cloud Run without requiring sticky sessions or exposing tokens to the browser. Uses Direct VPC Egress for internal routing. Secrets mounted from GCP Secret Manager.
                         </dd>
                         <dd>
                             <a className="about-github-link" target="_blank" href="https://github.com/bkelly0/demo-gateway-pkce">Github</a>
@@ -56,20 +56,20 @@ export default function AboutPage() {
                         </dd>
                         <dt>
                             <h3>3. Authorization Server</h3>
-                            <p><strong>Tech:</strong> Java, Spring Authorization Server</p>
+                            <p><strong>Tech:</strong> Java, Spring Authorization Server, GCP Secret Manager</p>
                         </dt>
                         <dd>
-                            Custom OAuth 2.0 / OIDC provider configured with CORS restricted to the gateway domain. Bootstraps default clients and users on startup, embedding global client scopes and fine-grained user roles directly into JWT claims.
+                            Custom OAuth 2.0 / OIDC provider configured with CORS restricted to the gateway domain. Bootstraps default clients and users on startup, embedding global client scopes and fine-grained user roles directly into JWT claims. Secrets mounted from GCP Secret Manager.
                         </dd>
                         <dd>
                             <a className="about-github-link" target="_blank" href="https://github.com/bkelly0/demo-authentication-server">Github</a>
                         </dd>
                         <dt>
                             <h3>4. Resource Services</h3>
-                            <p><strong>Tech:</strong> Java, Spring Boot, OpenAPI Generator</p>
+                            <p><strong>Tech:</strong> Java, Spring Boot, OpenAPI Generator, GCP Secret Manager</p>
                         </dt>
                         <dd>
-                            Backend microservices invoked by the gateway’s Service Account. Enforces two-tier authorization: verifying general client scopes alongside granular user roles (e.g., <code>read:api:a</code>, <code>read:api:b</code>) on OpenAPI-generated API endpoints.
+                            Backend microservices invoked by the gateway’s Service Account. Enforces two-tier authorization: verifying general client scopes alongside granular user roles (e.g., <code>read:api:a</code>, <code>read:api:b</code>) on OpenAPI-generated API endpoints. Secrets mounted from GCP Secret Manager.
                         </dd>
                         <dd>
                             <a className="about-github-link" target="_blank" href="https://github.com/bkelly0/demo-resource-api">Github</a>
@@ -77,10 +77,10 @@ export default function AboutPage() {
 
                         <dt>
                             <h3>5. Configuration Server</h3>
-                            <p><strong>Tech:</strong> Java, Spring Cloud Config, GCP Secret Manager</p>
+                            <p><strong>Tech:</strong> Java, Spring Cloud Config</p>
                         </dt>
                         <dd>
-                            Centralized configuration provider pulling secrets and application properties from GCP Secret Manager. Uses GCP labels to restrict secret access per service account, enforcing least-privilege security across the environment. Customized to allow referencing secrets using the sm:// format within yaml files hosted in the git repository.
+                            Centralized configuration provider pulling non-secret application properties from a private Github repository.
                         </dd>
                         <dd>
                             <a className="about-github-link" target="_blank" href="https://github.com/bkelly0/demo-config-server">Github</a>

@@ -40,7 +40,7 @@ steps:
       - --min-instances=0
       - --max-instances=1
       - --concurrency
-      - "10"
+      - "5"
       - --port
       - "8080"
       - --set-secrets
