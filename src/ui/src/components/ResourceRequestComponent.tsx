@@ -84,7 +84,7 @@ export default function ResourceRequestComponent({
             {statusCodeState === expectedStatus
                 ? <p><span className="success">Expected Result! </span>{resultMessage}</p>
                 : null}
-            {(statusCodeState != expectedStatus)
+            {(statusCodeState && statusCodeState != expectedStatus)
                 ? <p><span className="failed">This is not the expected result based on the user!</span></p>
                 : null}
           </div>
