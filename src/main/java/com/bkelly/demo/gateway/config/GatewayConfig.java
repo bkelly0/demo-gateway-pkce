@@ -62,7 +62,7 @@ public class GatewayConfig {
 
     return route("resource-health")
         .route(path("/resource/health"), http())
-        .before(setPath("/health"))
+        .before(setPath("/actuator/health"))
         .before(uri(resourceUri))
         .filter(addGoogleInvokerToken)
         .build();
