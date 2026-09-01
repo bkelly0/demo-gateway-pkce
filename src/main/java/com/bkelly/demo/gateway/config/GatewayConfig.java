@@ -53,6 +53,20 @@ public class GatewayConfig {
         .build();
   }
 
+  //pass-through for the resource server health endpoint
+  @Bean
+  RouterFunction<ServerResponse> gatewayRouteHealth(
+      @Value("${app.resource-server-uri}") URI resourceUri,
+      HandlerFilterFunction<ServerResponse, ServerResponse> addGoogleInvokerToken) {
+
+    return route("resource-health")
+        .route(path("/resource/health"), http())
+        .before(setPath("/health"))
+        .before(uri(resourceUri))
+        .filter(addGoogleInvokerToken)
+        .build();
+  }
+
   // uses the Authorization header for Google auth and a custom header for user auth
   @Bean
   HandlerFilterFunction<ServerResponse, ServerResponse> addGoogleInvokerToken(

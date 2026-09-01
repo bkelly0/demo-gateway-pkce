@@ -81,8 +81,8 @@ export default function ProtectedPage({
             Logout to try as another user
           </a>
         </p>
-        <ResourceRequestComponent url={"/api/a/v1"} expectedStatus={200} resultMessage={getMessageA()} />
-        <ResourceRequestComponent url={"/api/b/v1"} expectedStatus={403} resultMessage={getMessageB()}/>
+        <ResourceRequestComponent url={"/api/a/v1"} expectedStatus={username === "userA" ? 200 : 403} resultMessage={getMessageA()} />
+        <ResourceRequestComponent url={"/api/b/v1"} expectedStatus={username === "userA" ? 403 : 200} resultMessage={getMessageB()}/>
       </section>
     </main>
   );
