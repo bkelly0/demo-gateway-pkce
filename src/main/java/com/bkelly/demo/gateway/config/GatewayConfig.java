@@ -1,5 +1,6 @@
 package com.bkelly.demo.gateway.config;
 
+import static org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.setPath;
 import static org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.uri;
 import static org.springframework.cloud.gateway.server.mvc.filter.TokenRelayFilterFunctions.tokenRelay;
 import static org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctions.route;
@@ -53,7 +54,7 @@ public class GatewayConfig {
         .build();
   }
 
-  //pass-through for the resource server health endpoint
+  // pass-through for the resource server health endpoint
   @Bean
   RouterFunction<ServerResponse> gatewayRouteHealth(
       @Value("${app.resource-server-uri}") URI resourceUri,
