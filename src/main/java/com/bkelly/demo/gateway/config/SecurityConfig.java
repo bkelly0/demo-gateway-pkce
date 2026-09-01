@@ -40,7 +40,8 @@ public class SecurityConfig {
                         "/oauth2/**",
                         "/login/**",
                         "/api/auth/login",
-                        "/api/auth/auth-status")
+                        "/api/auth/auth-status",
+                        "/resource/health")
                     .permitAll()
                     .requestMatchers("/api/**")
                     .authenticated()

@@ -56,7 +56,7 @@ export default function AboutPage() {
                         </dd>
                         <dt>
                             <h3>3. Authorization Server</h3>
-                            <p><strong>Tech:</strong> Java, Spring Authorization Server, GCP Secret Manager</p>
+                            <p><strong>Tech:</strong> Java, Spring Authorization Server, GCP Secret Manager, PostgreSQL</p>
                         </dt>
                         <dd>
                             Custom OAuth 2.0 / OIDC provider configured with CORS restricted to the gateway domain. Bootstraps default clients and users on startup, embedding global client scopes and fine-grained user roles directly into JWT claims. Secrets mounted from GCP Secret Manager.

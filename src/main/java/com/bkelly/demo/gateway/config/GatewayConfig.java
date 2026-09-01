@@ -1,5 +1,6 @@
 package com.bkelly.demo.gateway.config;
 
+import static org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.setPath;
 import static org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.uri;
 import static org.springframework.cloud.gateway.server.mvc.filter.TokenRelayFilterFunctions.tokenRelay;
 import static org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctions.route;
@@ -49,6 +50,20 @@ public class GatewayConfig {
         .route(path("/api/b/v1/**"), http())
         .before(uri(resourceUri))
         .filter(tokenRelay())
+        .filter(addGoogleInvokerToken)
+        .build();
+  }
+
+  // pass-through for the resource server health endpoint
+  @Bean
+  RouterFunction<ServerResponse> gatewayRouteHealth(
+      @Value("${app.resource-server-uri}") URI resourceUri,
+      HandlerFilterFunction<ServerResponse, ServerResponse> addGoogleInvokerToken) {
+
+    return route("resource-health")
+        .route(path("/resource/health"), http())
+        .before(setPath("/actuator/health"))
+        .before(uri(resourceUri))
         .filter(addGoogleInvokerToken)
         .build();
   }
